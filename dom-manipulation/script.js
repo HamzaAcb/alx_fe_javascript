@@ -18,7 +18,19 @@ function loadQuotes() {
 function populateCategories() {
   const categories = ['all', ...new Set(quotes.map(quote => quote.category))];
   const categoryFilter = document.getElementById('categoryFilter');
-  categoryFilter.innerHTML = categories.map(category => `<option value="${category}">${category}</option>`).join('');
+
+  // Clear existing options
+  categoryFilter.innerHTML = '';
+
+  // Populate the dropdown menu
+  categories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category; // Use textContent to set the option text
+    categoryFilter.appendChild(option);
+  });
+
+  // Restore the last selected category
   const lastSelectedCategory = localStorage.getItem('lastSelectedCategory');
   if (lastSelectedCategory) {
     categoryFilter.value = lastSelectedCategory;
@@ -28,8 +40,10 @@ function populateCategories() {
 
 // Function to display a random quote
 function showRandomQuote() {
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const quote = quotes[randomIndex];
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const quote = filteredQuotes[randomIndex];
   const quoteDisplay = document.getElementById('quoteDisplay');
   quoteDisplay.innerHTML = `<p>${quote.text}</p><p><em>${quote.category}</em></p>`;
   sessionStorage.setItem('lastViewedQuote', JSON.stringify(quote));
@@ -65,7 +79,7 @@ function createAddQuoteForm() {
   categoryInput.placeholder = 'Enter quote category';
 
   const addButton = document.createElement('button');
-  addButton.innerText = 'Add Quote';
+  addButton.textContent = 'Add Quote'; // Use textContent for button text
   addButton.addEventListener('click', addQuote);
 
   formContainer.appendChild(quoteInput);
