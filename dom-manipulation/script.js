@@ -14,6 +14,18 @@ function loadQuotes() {
   }
 }
 
+// Function to populate categories dynamically
+function populateCategories() {
+  const categories = ['all', ...new Set(quotes.map(quote => quote.category))];
+  const categoryFilter = document.getElementById('categoryFilter');
+  categoryFilter.innerHTML = categories.map(category => `<option value="${category}">${category}</option>`).join('');
+  const lastSelectedCategory = localStorage.getItem('lastSelectedCategory');
+  if (lastSelectedCategory) {
+    categoryFilter.value = lastSelectedCategory;
+    filterQuotes();
+  }
+}
+
 // Function to display a random quote
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -30,6 +42,7 @@ function addQuote() {
   if (newQuoteText && newQuoteCategory) {
     quotes.push({ text: newQuoteText, category: newQuoteCategory });
     saveQuotes();
+    populateCategories();
     document.getElementById('newQuoteText').value = '';
     document.getElementById('newQuoteCategory').value = '';
     alert('New quote added successfully!');
@@ -81,9 +94,25 @@ function importFromJsonFile(event) {
     const importedQuotes = JSON.parse(event.target.result);
     quotes.push(...importedQuotes);
     saveQuotes();
+    populateCategories();
     alert('Quotes imported successfully!');
   };
   fileReader.readAsText(event.target.files[0]);
+}
+
+// Function to filter quotes based on selected category
+function filterQuotes() {
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  localStorage.setItem('lastSelectedCategory', selectedCategory);
+  const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
+  const quoteDisplay = document.getElementById('quoteDisplay');
+  if (filteredQuotes.length > 0) {
+    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+    const quote = filteredQuotes[randomIndex];
+    quoteDisplay.innerHTML = `<p>${quote.text}</p><p><em>${quote.category}</em></p>`;
+  } else {
+    quoteDisplay.innerHTML = '<p>No quotes available for this category.</p>';
+  }
 }
 
 // Event listeners
@@ -93,6 +122,7 @@ document.getElementById('importFile').addEventListener('change', importFromJsonF
 
 // Initialize the application
 loadQuotes();
+populateCategories();
 createAddQuoteForm();
 
 // Display the last viewed quote on page load (if any)
@@ -102,4 +132,3 @@ if (lastViewedQuote) {
   const quoteDisplay = document.getElementById('quoteDisplay');
   quoteDisplay.innerHTML = `<p>${quote.text}</p><p><em>${quote.category}</em></p>`;
 }
-  
