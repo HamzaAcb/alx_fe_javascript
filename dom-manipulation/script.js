@@ -167,14 +167,39 @@ async function syncQuotes() {
       quotes = serverQuotes;
       saveQuotes();
       populateCategories();
-      alert('Data updated from server.');
+      showNotification('Quotes synced with server!');
     }
 
     // Post local data to server
     await postQuotesToServer();
   } catch (error) {
     console.error('Error syncing quotes:', error);
+    showNotification('Error syncing quotes. Please try again.');
   }
+}
+
+// Function to show notifications
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = message;
+  
+  // Style the notification
+  notification.style.position = 'fixed';
+  notification.style.bottom = '10px';
+  notification.style.right = '10px';
+  notification.style.backgroundColor = '#333';
+  notification.style.color = '#fff';
+  notification.style.padding = '10px';
+  notification.style.borderRadius = '5px';
+  notification.style.zIndex = '1000';
+  
+  document.body.appendChild(notification);
+  
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    document.body.removeChild(notification);
+  }, 3000);
 }
 
 // Function to start periodic sync
@@ -200,3 +225,4 @@ if (lastViewedQuote) {
   const quoteDisplay = document.getElementById('quoteDisplay');
   quoteDisplay.innerHTML = `<p>${quote.text}</p><p><em>${quote.category}</em></p>`;
 }
+
