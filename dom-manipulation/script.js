@@ -28,7 +28,7 @@ function populateCategories() {
   categories.forEach(category => {
     const option = document.createElement('option');
     option.value = category;
-    option.textContent = category;  // Use textContent to set option text
+    option.textContent = category; // Use textContent to set option text
     categoryFilter.appendChild(option);
   });
 
@@ -129,15 +129,40 @@ function filterQuotes() {
   }
 }
 
-// Function to synchronize quotes with the server
-async function syncQuotes() {
+// Function to fetch quotes from the server
+async function fetchQuotesFromServer() {
   try {
-    // Fetch data from server
     const response = await fetch(SERVER_URL);
     if (!response.ok) throw new Error('Failed to fetch data from server');
     const serverQuotes = await response.json();
-    
-    // Check for conflicts and resolve
+    return serverQuotes; // Adjust based on your API response format
+  } catch (error) {
+    console.error('Error fetching from server:', error);
+    return [];
+  }
+}
+
+// Function to post quotes to the server
+async function postQuotesToServer() {
+  try {
+    await fetch(SERVER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(quotes)
+    });
+    console.log('Data successfully posted to server');
+  } catch (error) {
+    console.error('Error posting to server:', error);
+  }
+}
+
+// Function to sync quotes with the server
+async function syncQuotes() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
+
     if (serverQuotes.length > 0) {
       // Simple conflict resolution: prioritize server data
       quotes = serverQuotes;
@@ -147,13 +172,7 @@ async function syncQuotes() {
     }
 
     // Post local data to server
-    await fetch(SERVER_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(quotes)
-    });
+    await postQuotesToServer();
   } catch (error) {
     console.error('Error syncing quotes:', error);
   }
@@ -182,4 +201,3 @@ if (lastViewedQuote) {
   const quoteDisplay = document.getElementById('quoteDisplay');
   quoteDisplay.innerHTML = `<p>${quote.text}</p><p><em>${quote.category}</em></p>`;
 }
-
