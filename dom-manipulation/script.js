@@ -1,6 +1,5 @@
 const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Replace with your actual API endpoint
 
-// Array of quote objects
 let quotes = [];
 
 // Function to save quotes to local storage
@@ -132,7 +131,7 @@ function filterQuotes() {
 // Function to fetch quotes from the server
 async function fetchQuotesFromServer() {
   try {
-    const response = await fetch(SERVER_URL);
+    const response = await fetch(SERVER_URL); // Replace SERVER_URL with your actual API endpoint
     if (!response.ok) throw new Error('Failed to fetch data from server');
     const serverQuotes = await response.json();
     return serverQuotes; // Adjust based on your API response format
